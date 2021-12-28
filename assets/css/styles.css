@@ -161,7 +161,17 @@ ul {
 
 p {
     margin-bottom: 12px;
+    text-align: justify;
 }
+
+.caption {
+    text-align: center !important;
+}
+
+.tableStyle table {
+    overflow-x: auto;
+    width: 60%;
+  }
 
 .__h_video:last-child,
 .highlight:last-child,

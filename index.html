@@ -23,7 +23,344 @@
 </li>
 </ul>
 </header>
+<nav id=page-toc>
+<h2>Table of Contents</h2>
+<ul>
+<li><a href=#introduction>Introduction</a></li>
+<li><a href=#research-questions>Research Questions</a></li>
+<li><a href=#contributions>Contributions</a></li>
+<li><a href=#background>Background</a></li>
+<li><a href=#methodology>Methodology</a></li>
+<li><a href=#results>Results</a></li>
+<li><a href=#discussion>Discussion</a></li>
+<li><a href=#about-the-team>About the team</a></li>
+</ul>
+</nav>
 <main id=page-content>
+<h2 id=introduction>Introduction</h2>
+<p>One of the major security concerns with modern-day software applications is their strong dependency on Open Source Software (OSS) libraries. The vulnerabilities in the OSS libraries can be exploited by malicious cyber attacks, and threaten the security of dependent software. With strong dependency on OSS libraries, software applications continue to face malicious attacks due to the vulnerabilities discovered in OSS libraries. According to Synopsys Cybersecurity Research Center&rsquo;s (CyRC) &ldquo;Open Source Security and Risk Analysis&rdquo; (OSSRA) report in 2021, 98% of 1546 industry codebases audited rely on OSS libraries and 84% of them are subject to at least one public open source vulnerability, which is a 9% increase compared to 2020 \cite{Synopsys21}. Furthermore, vulnerabilities are found in both direct and indirect dependencies, where the majority of vulnerabilities found in Node.js, Java, and Ruby projects are introduced by indirect dependencies \cite{Snyk20}. Therefore, detecting vulnerabilities in OSS libraries through dependency analysis is crucial in preventing security attacks.</p>
+<p>Previous research has focused on studying different scopes to identify vulnerabilities introduced by OSS library dependency. For example, Decan et al. in 2018 used the metadata from 610k JavaScript packages to analyze the time and duration of vulnerabilities in those packages introduced by direct dependencies \cite{decan2018impact}. In parallel to Decan&rsquo;s work, Pashchenko et al. also used metadata to identify vulnerabilities due to dependencies \cite{pashchenko2018vulnerable}. They published a framework on how to report vulnerable dependencies in OSS with a focus on the 200 most popular Java libraries. Taking a different approach than identifying vulnerabilities from metadata, in 2020, Ponta et al. developed a code-centric, usage-based vulnerable detection tool, \textit{Eclipse Steady}, to overcome the inaccurate release versions and unavailable vulnerability information from metadata \cite{ponta2020detection}. However, no studies have been done to count for vulnerabilities induced by both direct and indirect dependencies in JavaScript packages, especially as 86% of the npm projects are reported to be affected by vulnerabilities from indirect dependencies \cite{Snyk20}.</p>
+<h2 id=research-questions>Research Questions</h2>
+<p>There are a handful of studies focusing on vulnerabilities in OSS projects through dependency analysis. The study from Decan et al. \cite{decan2018impact}, introduced in the previous section, inspired our project. We extended their vulnerable dependency study to include vulnerabilites due to three dependency types: vulnerability arising from the package itself (\textit{self}), vulnerability from one or more direct dependencies (\textit{direct}), and vulnerabilities from one or more indirect dependencies through a dependency chain (\textit{indirect}). The study from Pashchenko et al. \cite{pashchenko2018vulnerable} built up a framework to trace the vulnerabilities through direct and indirect dependency, which we adopted in our study as the ground work. Lastly, no prior study has focused on identifying the immediate vulnerable OSS packages, which upon the release time had known vulnerable dependencies, either direct or indirect. Therefore, in addition to categorizing the vulnerability dependency, we also diagnosed if the package has immediate vulnerabilities.</p>
+<p>Our overall goal for this project was to perform empirical research and vulnerable dependency analysis of popular OSS projects and libraries within the npm ecosystem, with the following specific research questions:</p>
+<ol>
+<li>Which aspects and metrics should be considered when determining the popularity of npm OSS packages?</li>
+<li>How many vulnerable npm packages should we consider for our research study and why?</li>
+<li>Analyzing vulnerabilities in popular vulnerable npm packages to find out:
+<ol>
+<li>When are vulnerabilities discovered, and what are their distributions with respect to vulnerability dependency types and severity levels?</li>
+<li>Which packages are immediately vulnerable, and what are their distributions with respect to vulnerability dependency types and severity levels?</li>
+<li>What are the most frequent vulnerability types and severity levels in all package releases and most recent release?</li>
+</ol>
+</li>
+</ol>
+<h2 id=contributions>Contributions</h2>
+<p>Our project adopts an empirical approach in identifying and analyzing the vulnerabilities occurring in JavaScript npm packages through both direct and indirect dependencies, with the following contributions:</p>
+<ul>
+<li>We identified unique metrics to account for both technical and social influence in determining the popularity of npm packages.</li>
+<li>We determined the top 2,000 packages to represent the most-influential npm packages since vulnerabilities found in these packages will have a widespread impact.</li>
+<li>We highlighted the vulnerabilities among top 2,000 npm packages and their past releases based on
+<ul>
+<li>Vulnerability discovery time: Whether the vulnerability in a dependency of the package was published before or after the release of that package. If the vulnerability in the dependency was published before the release of the package, then the package is said to be \textit{immediately vulnerable}.</li>
+<li>Vulnerability dependency: if the vulnerability is within the package itself (\textit{self}), directly depending on a vulnerable package (\textit{direct}), or depending on a vulnerable package through a dependency chain (\textit{indirect}).</li>
+<li>Vulnerability types and severity levels (\textit{critical}, \textit{high}, \textit{medium}, or \textit{low}).</li>
+</ul>
+</li>
+</ul>
+<h2 id=background>Background</h2>
+<p>The project goal of investigating the chain of vulnerabilities in popular OSS software drove us to research the three relevant sub-areas for literature review, specifically,</p>
+<ol>
+<li>What are the metrics used in the previous study to evaluate the popularity of an OSS software?</li>
+<li>What frameworks have been established to trace vulnerabilities through dependency analysis?</li>
+<li>What vulnerability studies have been conducted specifically for npm ecosystem?</li>
+</ol>
+<p>The very first task in our study is identifying popular packages. However, it is not trivial to decide which popularity metrics to consider since there are diverse criteria of popularity. As a case study, Zerouali et al. computed Spearman ($\rho$) correlation factors between 9 different popularity metrics for a large dataset of 175k npm packages \cite{zerouali2019diversity}. Indeed, they found that many popularity metrics are not strongly correlated ($\rho=0.57$), which implies that the use of different metrics may produce different outcomes. This result clearly shows that the context of popularity should be considered when we select popularity metrics for a specific study.</p>
+<p>One of the most important aspects of our research is understanding how to properly define vulnerable open source dependencies and how to use a precise, constructive and empirical approach to vulnerability measurement. The research by Pashchenko at al. addresses this concern by considering source data not just from repositories, but also from analyzing build and testing information, patch updates, etc. \cite{pashchenko2018vulnerable}. The study emphasized a focus on OSS usage in industry, where 80% of average commercial project consists of OSS, and 20% of dependencies with known vulnerabilities are not deployed. The methodology and data used in this study is language-agnostic and only relies on availability of dependency management system, such as Maven (Java), PIP (Python), NPM (Javascript), etc. Their results apply not only to Maven but equally well for npm data. They considered 10905 distinct GAV (group, artifact, version) data nodes. The results show that of all vulnerabilities found, a significant number (1 in 5) is never deployed to production. Regarding who is responsible for (and can potentially fix) the vulnerabilities, their study indicates that the source comes from direct and own dependencies, which are upon developers to actually fix the security issues. In addition, transitive dependencies with halted development have the highest cost associated with finding and fixing the vulnerabilities. These results from the study shows the importance of an accurate, methodical and empirical vulnerability measurement for OSS projects as well as to developers and companies.</p>
+<p>The dependency across npm packages can be clearly illustrated in a simple graph. However, the characteristics of such framework was not well studied until Zimmermann et al. presented their research on the global property of the dependency graph in npm ecosystem and the relation with vulnerabilities. The result showed that the dependency across npm packages is increasing super-linearly with time, and the distribution of dependency number is nearly exponential \cite{zimmermann2019small}. This result proved that highly popular packages have the dominate influence on npm ecosystem. Zimmermann et al. also discovered a moderate correlation between dependency and vulnerabilities \cite{zimmermann2019small}. Because of such significant difference between popular packages and ordinary packages, we computed such correlation between the dependency and vulnerabilities within the realm of popular packages.</p>
+<p>Vulnerabilities spread between software packages through dependencies. One of the vulnerability studies done in the npm ecosystem by Decan et al. surveyed 610k JavaScript packages to analyze how and when different vulnerabilities are discovered and fixed in the npm package dependency network, and to what extent do they affect other packages \cite{decan2018impact}. The study reveals that it takes more than 2 years to discover 50% of the vulnerabilities, and an even longer time to discover low severity ones. In addition to the delay in detecting vulnerabilities, they concluded that more than 33% of affected dependent packages are not updated even if an upstream fix is available because of restrictive dependency constraints. We extended these aspects of their study by analyzing how vulnerable npm packages affect directly and indirectly dependent packages.</p>
+<h2 id=methodology>Methodology</h2>
+<h3 id=study-design>Study Design</h3>
+<p>We designed the experiment by first finding the top $N$ most important packages within the npm ecosystem, and then investigating the vulnerabilities in the selected packages.</p>
+<h4 id=identifying-important-packages>Identifying important packages</h4>
+<p>There are various popularity metrics for packages, making it challenging to decide what metrics should be used to select popular packages. Although those metrics show moderate correlation ($p = 0.57$) \cite{zerouali2019diversity}, each can be interpreted from a different point of view, and can also be measured in a different way. Therefore, we combined both \textit{social} aspect (e.g. the number of stars, forks and watchers on GitHub) and \textit{technical} aspect of popularity (e.g. download count and number of depending packages) to avoid any possible bias.</p>
+<h4 id=identifying-vulnerabilities-and-dependency-analysis>Identifying Vulnerabilities and Dependency Analysis</h4>
+<p>Given a list of important packages, we searched for vulnerabilities by the name of each package on Snyk Advisor \cite{snykadvisor}. For npm, Snyk reports vulnerabilities not only in that very package and direct dependencies, but also transitive dependencies over all the versions published within npm \cite{Snyk20}. Vulnerabilities found are then categorized by the vulnerability types and severity levels for further analysis.</p>
+<h3 id=data-collection>Data Collection</h3>
+<p>For this project, we explored various sources of data, including \textit{Libraries.io}, \textit{npm}, \textit{GitHub} and \textit{Synk Vulnerability Database}, to investigate packages dependencies and vulnerabilities in the published packages within npm.</p>
+<h4 id=librariesio-and-npm>Libraries.io and npm</h4>
+<p>Open Source Repository and Dependency Metadata dataset, or \textit{Libraries.io} \cite{jeremy_katz_2020_3626071}, includes metadata of packages (package name, version, list of dependencies, etc.) from 34 different package managers. We filtered data for packages published in npm to extract the required dependencies for them. This allowed us to investigate the relationships among packages without manually extracting information from \textit{.json} manifest file that stores the metadata of each npm package. In addition to \textit{Libraries.io}, we utilized npm as the source by querying all release metadata, including release name and timestamp, for each package of interest.</p>
+<h4 id=github>GitHub</h4>
+<p>Based on the data filtered for npm packages, we extracted GitHub stars, forks and watchers using GitHub APIs \cite{githubapi}. We combined these metrics to account for the \textit{social} influences in selecting popular npm packages for vulnerability analysis.</p>
+<h4 id=snyk-vulnerability-database>Snyk Vulnerability Database</h4>
+<p>We explored Snyk Vulnerability Database (Snyk DB) for identifying vulnerabilities in npm packages \cite{snykvdb}. The database allows users to use package name and optionally with package release name to search for known vulnerabilities in that package. To pipeline the querying process from Snyk, we developed an extractor in Python script to search a given npm package&rsquo;s vulnerability with package name, version, and GitHub URL through Snyk Command Line Interface (CLI) tool.</p>
+<h3 id=variables-considered>Variables Considered</h3>
+<p>The two main tasks of the project, i.e. identifying popular npm packages and investigating their vulnerabilities, are concerned with different sets of variables and attributes from the data extracted. In order to extract popular npm packages from the \textit{Libraries.io} dataset, we considered their direct dependent package list, to examine the technical influence of each package. We also developed a tool to extract each package&rsquo;s stars, forks and watchers from their GitHub repositories to examine their social influence.</p>
+<p>To analyze the vulnerability of each popular package, specifically the vulnerability dependency types and discovery time, we divided the vulnerability information extraction into two phases. First, for all popular packages and their past releases, we scanned their basic vulnerable data by querying from Snyk whether a package release was vulnerable, their number of vulnerabilities, and the count of critical, high, medium, low severity vulnerabilities, if present. Then, for the releases that has vulnerabilities recorded, we further extracted detailed vulnerable attributes, including the disclosure and publication time of the vulnerabilities, the dependency path tracing back to the problematic source package, and the release name when the vulnerability was fixed.</p>
+<h3 id=analysis-methods>Analysis Methods</h3>
+<p>To compare the different metrics in searching for the ones that can best represent the social and technical aspect of the npm packages, we adopted the methods in the research of Zerouali et al. which computed Pearson ($R$) and Spearman ($\rho$) correlation factors across different popularity metrics \cite{zerouali2019diversity}. Using the threshold cutoff relation of $0 &lt; \textit{very weak} \leq 0.2 &lt; \textit{weak} \leq 0.4 &lt; \textit{moderate} \leq 0.6 &lt; \textit{moderately strong} \leq 0.8 &lt; \textit{strong} \leq 1$, we compared the similarities between the candidate metrics to decide if the correlation between any metric is strong enough to demonstrate the influence of the packages.</p>
+<p>Our analysis of vulnerabilities in a package can be divided into several steps: if the package has any vulnerabilities, then finding the discovery time of such vulnerabilities, the type of vulnerable dependency, and the severity level. To check if the package and its release have any vulnerabilities, we first queried the vulnerability in a form of json file from Snyk using the package name and its release we obtained from npm, and extracted the node \verb|ok| in the json to determine if any vulnerability was recorded.</p>
+<p>For every vulnerability found, the discovery time of each can be associated by either \verb|disclosureTime|, the time the vulnerable was first disclosed, or \verb |publicationTime|, the time the vulnerable was publicly announced. In our research, we adopted the \verb|publicationTime| instead of \verb|disclosureTime| since the former is a more accurate measure of when a release is publicly know to be vulnerable than the latter. The vulnerability dependency type can be analyzed by the node \verb|from| which listed the source of vulnerability through the dependency. If \verb|from| has only one package, then the vulnerable dependency comes from the package itself. Similarly, if \verb|from| has two packages, then vulnerability arises from direct dependencies too, while more than two packages indicates the vulnerability in a release arises from indirect dependencies as well. Lastly, the severity of the vulnerability is highlighted by the node \verb|severity| in Snyk DB, ranging from critical, high, medium, to low. Once all these attributes are tabulated for each vulnerability in all packages, we aggregated the statistics using histograms and box plots to answer RQ3.</p>
+<h2 id=results>Results</h2>
+<h3 id=rq1-which-aspects-and-metrics-should-be-considered-when-determining-the-popularity-of-npm-oss-packages>RQ1: Which aspects and metrics should be considered when determining the popularity of npm OSS packages?</h3>
+<p>Popularity can be defined and measured in various ways. Thus, each study needs to rely on study-specific popularity metrics considering the context of popularity. In our project, we investigated both \textit{technical} and \textit{social} aspects of popularity \cite{zerouali2019diversity} and selected one metric from each aspect. Finally, we derived the top $N$ popular packages by combining these two different metrics.</p>
+<h4 id=technical-aspect>Technical aspect</h4>
+<p>The more dependents packages have, the greater effect their vulnerabilities. This is because a package&rsquo;s vulnerability can be disseminated throughout their dependents. In this context, the number of dependents is one of the important metrics in the technical aspect of popularity in our project. However, simply using this as a metric may fall into a pitfall since it does not take the chain of dependencies into account.</p>
+<p>For example, let&rsquo;s consider a 8-node dependency graph. In Figure \ref{fig:simple_graph}, each node represents a package, and an edge from package \textit{u} to package \textit{v} represents that \textit{u} is a dependent of \textit{v}. The example graph shows that the number of dependents only captures the direct neighbors of each node, thus implicitly important packages may have low values. Although the in-degree, which is the number of dependents, of package \textit{A} is only 1, it is clear that executing any of packages \textit{B, D, E, F, G} and \textit{H} results in executing package \textit{A}.</p>
+<p align=center>
+<img src=./assets/img/simple_dep_graph.png alt=tag width=100%>
+</p>
+<p class=caption>
+<i>8-node dependency graph</i>
+</p>
+<p>To take transitive dependency into account, we computed \textit{PageRank} \cite{page1999pagerank} of the dependency graph. PageRank algorithm gives more weight on the edge of relatively important nodes. Thus, in Figure \ref{fig:simple_graph}, even if package \textit{A} has only one dependent package \textit{B}, package \textit{A} has the highest PageRank since its dependent has many other dependents.</p>
+<p>We measured Pearson ($R$) and Spearman ($\rho$) correlation coefficient between \textit{dependent projects count} and \textit{PageRank} of packages. We observed strong non-linear correlations between them ($\rho=0.40, R=0.87$) and decided it is high enough to select one metric on behalf of the other one. Thus \textit{PageRank} is finally selected as a single metric for the technical aspect of popularity metric.</p>
+<h4 id=social-aspect>Social aspect</h4>
+<p>Al-Rubaye et al. surveyed several mechanisms for scoring popularity among GitHub repositories \cite{al2020scoring}. They mention starring, forking and watching repositories as the most common mechanisms for \textit{liking} content and providing social media style interactions on GitHub. Thus, in context of social aspects, we used these metrics to measure popularity.</p>
+<p>We measured the Pearson ($\rho$) and Spearman ($R$) correlation coefficients for the number of \textit{watchers}, \textit{forks} and \textit{stars}. Table \ref{table:github_stats_correlation} shows the correlations for these GitHub popularity metrics. We observed strong linear correlations between the three popularity metrics. Therefore, we decided to only use the number of stars to determine the top-N popular packages.</p>
+<table>
+<thead>
+<tr>
+<th style=text-align:center></th>
+<th style=text-align:center>#watchers</th>
+<th style=text-align:center>#forks</th>
+<th style=text-align:center>#stars</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style=text-align:center><b>#watchers</b></td>
+<td style=text-align:center>$\rho=1.00$<br>$R=1.00$</td>
+<td style=text-align:center>$\rho=0.76$<br>$R=0.92$<br><b><i>strong</i></b></td>
+<td style=text-align:center>$\rho=0.91$<br>$R=0.91$<br><b><i>strong</i></b></td>
+</tr>
+<tr>
+<td style=text-align:center><b>#forks</b></td>
+<td style=text-align:center></td>
+<td style=text-align:center>$\rho=1.00$<br>$R=1.00$</td>
+<td style=text-align:center>$\rho=0.79$<br>$R=0.96$<br><b><i>strong</i></b></td>
+</tr>
+<tr>
+<td style=text-align:center><b>#stars</b></td>
+<td style=text-align:center></td>
+<td style=text-align:center></td>
+<td style=text-align:center>$\rho=1.00$<br>$R=1.00$</td>
+</tr>
+</tbody>
+</table>
+<p class=caption>
+<i>Pearson and Spearman correlation coefficients for GitHub popularity metrics</i>
+</p>
+<h3 id=rq2-how-many-vulnerable-npm-packages-should-we-consider-for-our-research-study-and-why>RQ2: How many vulnerable npm packages should we consider for our research study and why?</h3>
+<p>To determine the value of $N$ for the top $N$ npm packages for our study, we closely examined the distribution of the two popularity metrics, PageRank and Github repository stars.</p>
+<p>Starting with PageRank, left of Figure \ref{Fig:PageRank_Stars_Distribution} shows the calculated PageRank value with respect to the corresponding package rank. The PageRank value demonstrates a beyond exponential decrease as the package rank is increasing. Thus, selecting only top 5,000, shown by the vertical red line in the figure, PageRank packages is sufficient for covering the popular package from the technical aspect.</p>
+<p align=center>
+<img src=./assets/img/threshold_cutoff.png alt=tag width=100%>
+</p>
+<p class=caption>
+<i>PageRank (left) and GitHub stars (right) distribution with respect to Package's Popularity Rank</i>
+</p>
+<p>We fetched GitHub repositories for the top 5,000 packages ranked by PageRank and sorted the package list again to account for the social influence of the package. Similar to the PageRank, the distribution of packages' GitHub star number in the right of Figure \ref{Fig:PageRank_Stars_Distribution} declined exponentially as the package order increases. As highlighted by the red vertical line in the same plot, choosing $N = 2000$ as a threshold can capture the popular npm packages from both technical and social perspective, while keeping the dataset in a reasonable size.</p>
+<h3 id=rq3-analyzing-vulnerabilities-in-popular-vulnerable-npm-packages>RQ3: Analyzing vulnerabilities in popular vulnerable npm packages</h3>
+<p>The top 2,000 npm packages selected yields 231,488 releases in total, with the earliest dated back to 2010. Among these, 60.6% releases do not have known vulnerabilities, 38.8% have one or more vulnerabilities, and 0.695% releases do not have data from Snyk DB. By examining the data that does not have record at Snyk DB, we discovered that these are either old or preview releases and does not concern with our purpose of study, and thus the 0.695% , or 1609 releases, was removed from our data.</p>
+<p>Between the packages with vulnerabilities, there are in total 864 packages and 89,658 releases, resulting in 1,654,568 vulnerabilities for further analysis. The sections 4.3.1 through 4.3.3 address the study of scanning vulnerability discovery time, zooming into immediate vulnerable, and ranking the top vulnerable types and severity levels.</p>
+<h4 id=when-are-vulnerabilities-discovered-and-what-are-their-distributions-with-respect-to-vulnerability-dependency-types-and-severity-levels>When are vulnerabilities discovered, and what are their distributions with respect to vulnerability dependency types and severity levels?</h4>
+<p>We first began by surveying the vulnerability type of all 1,654,568 vulnerabilities to decide if the vulnerability was introduced within the package itself (self), from a directly dependent package (direct), or from depending on a vulnerable root package through a chain (indirect). The statistics revealed that \textbf{most vulnerabilities (75.4%) were introduced from indirect dependency}, with the rest 18.5% from direct dependency, and only a small portion (6.19%) was from package itself.</p>
+<p align=center>
+<img src=./assets/img/vulnDiscoveryTime_depType.png alt=tag width=100%>
+</p>
+<p class=caption>
+<i>Vulnerable discovery time based on dependency type</i>
+</p>
+<p>To determine when the vulnerabilities were discovered, we calculated the time lapsed between the \textit{release time} of a vulnerable package and the \textit{publication time} of the corresponding vulnerability in days, and plotted it against the vulnerability dependency type of self, direct, or indirectly depending on a vulnerable root package in Figure \ref{Fig:VulnDiscoveryTime_depType}. Most vulnerabilities were discovered after the release of the package, as the time lapsed between package release and vulnerable publication is positive. As Figure \ref{Fig:VulnDiscoveryTime_depType} uncovers, the discovery time of vulnerabilities shows different patterns based on dependency type: \textbf{for packages that have vulnerabilities within themselves, it took shorter time to discover those vulnerabilities}, compared to those which have vulnerabilities due direct or indirect dependencies. The time to catch vulnerabilities due to indirect dependencies can range from one to nearly 3000 days, while the time to detect and publish a vulnerability from direct dependency peaked around 1000 days. Only a small portion of vulnerabilities are immediately vulnerable with negative time lapsed, and will be discussed in detail in the next section.</p>
+<p align=center>
+<img src=./assets/img/vulnDiscoveryTime_severity.png alt=tag width=100%>
+</p>
+<p class=caption>
+<i>Vulnerable discovery time based on dependency type</i>
+</p>
+<p>In addition to examining the vulnerability discovery time with respect to the dependency type, we further studied the discovery time from the perspective of vulnerability severity level, as shown in Figure \ref{Fig:VulnDiscoveryTime_severity} with a box plot. Note that there are no significant difference in vulnerability discovery time based on severity, with relatively shorter discovery time in severity vulnerabilities.</p>
+<h4 id=which-packages-are-immediately-vulnerable-and-what-are-their-distributions-with-respect-to-vulnerability-dependency-types-and-severity-levels>Which packages are immediately vulnerable, and what are their distributions with respect to vulnerability dependency types and severity levels?</h4>
+<p>Through this question, we aimed to understand how many packages are immediately vulnerable, i.e. a vulnerability had already been found and published in a direct or indirect dependency at the time of the release. We also analyzed how many of such immediately vulnerable packages have vulnerabilities due to direct and indirect dependencies.</p>
+<p>Of all the vulnerabilities that we analyzed, we found that $82,777$ (5% of the $1,654,568$ vulnerabilities) can be considered immediate vulnerabilities. Of these immediate vulnerabilities, \textbf{a large majority ($74,258$ out of $82,777$ or 89.71%) are caused by indirect dependencies} and only a small percentage ($7,177$ out of $82,777$ or 9.32%) due to direct dependencies. Figure \ref{Fig:ImmediatelyVulnerable} shows the number of days before the release of a package when a vulnerability was published in its dependencies. We can see that most immediately vulnerable releases are using dependencies in which \textbf{vulnerabilities have been published within 6 months before the release}. Interestingly, there are some immediately vulnerable releases that have used dependencies where vulnerability was published ~6.5 years ago.</p>
+<p align=center>
+<img src=./assets/img/immediately_vuln.png alt=tag width=100%>
+</p>
+<p class=caption>
+<i>Immediately vulnerable releases based on dependency type</i>
+</p>
+<p>Table \ref{table:ImmediatelyVulnerableSeverity} shows the severity levels of vulnerabilities found in all immediate vulnerabilities. We observed that majority of the vulnerabilities were of medium severity, around a quarter were of high severity and a very small fraction were of critical severity.</p>
+<div class=tableStyle align=center>
+<table>
+<thead>
+<tr>
+<th style=text-align:center><b>Severity</b></th>
+<th style=text-align:right><b>Vulnerabilities</b></th>
+<th style=text-align:right><b>Percentage</b></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style=text-align:center>Low</td>
+<td style=text-align:right>13,826</td>
+<td style=text-align:right>16.70%</td>
+</tr>
+<tr>
+<td style=text-align:center>Medium</td>
+<td style=text-align:right>49,105</td>
+<td style=text-align:right>59.32%</td>
+</tr>
+<tr>
+<td style=text-align:center>High</td>
+<td style=text-align:right>19,123</td>
+<td style=text-align:right>23.10%</td>
+</tr>
+<tr>
+<td style=text-align:center>Critical</td>
+<td style=text-align:right>723</td>
+<td style=text-align:right>0.87%</td>
+</tr>
+<tr>
+<td style=text-align:center><b>Total</b></td>
+<td style=text-align:right><b>82,777</b></td>
+<td style=text-align:right><b>100.00%</b></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class=caption>
+<i>Severity levels of vulnerabilities in immediately vulnerable releases</i>
+</p>
+<h4 id=what-are-the-most-frequent-vulnerable-types-and-severity-levels-in-all-package-releases-and-most-recent-release>What are the most frequent vulnerable types and severity levels, in all package releases and most recent release?</h4>
+<p>Based on the 1,654,568 vulnerabilities analyzed, for both all past releases and the most recent release, we summarized the most frequent types of vulnerabilities in table \ref{table:MostFreqVuln}. Interestingly, both most recent releases and all past releases \textbf{share the same set of the most frequency vulnerability types}: &ldquo;Regular Expression Denial of Service (ReDoS)&rdquo;, &ldquo;Prototype Pollution&rdquo;, and &ldquo;Arbitrary Code Injection&rdquo;, and the majority of vulnerabilities across both datasets are in medium severity level.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Most Frequent Vulnerability Types</strong></th>
+<th><strong>All Releases</strong></th>
+<th><strong>Most Recent release</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Regular Expression Denial of Service (ReDoS)</td>
+<td>39.8%</td>
+<td>19.3%</td>
+</tr>
+<tr>
+<td>Prototype Pollution</td>
+<td>23.8%</td>
+<td>9.30%</td>
+</tr>
+<tr>
+<td>Arbitrary Code Injection</td>
+<td>7.34%</td>
+<td>56.5%</td>
+</tr>
+</tbody>
+</table>
+<p class=caption>
+<i>Most frequent vulnerable types in all releases and most recent release</i>
+</p>
+<div class=tableStyle align=center>
+<table>
+<thead>
+<tr>
+<th><strong>Severity</strong></th>
+<th><strong>All Releases</strong></th>
+<th><strong>Most Recent Release</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low</td>
+<td>4.25%</td>
+<td>3.52%</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>50.6%</td>
+<td>75.1%</td>
+</tr>
+<tr>
+<td>High</td>
+<td>43.0%</td>
+<td>20.2%</td>
+</tr>
+<tr>
+<td>Critical</td>
+<td>2.21%</td>
+<td>1.15%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class=caption>
+<i>Most frequent vulnerability severity levels in all releases and most recent releases</i>
+</p>
+<p>In addition to the most frequent types and severity level of the vulnerabilities, we noticed some very interesting trends and outliers worth highlighting. Across all of the severity levels, the percentage of vulnerabilities that can be fixed by upgrading the vulnerable packages is highest for critical vulnerabilities (79%) and low-severity vulnerabilities (77%) while medium and high severity packages can only be fixed by upgrading 61% and 67% of vulnerable packages, respectively. Also we found that for critical severity packages, for every 438 vulnerabilities fixed there is 1 vulnerability that is not fixed. For non-critical packages, that ratio drops to an average of 1 vulnerability not fixed for every 21 vulnerabilities fixed, which is a quantifiably big difference on the attitude and importance given to critically vulnerable packages in the open source community.</p>
+<h2 id=discussion>Discussion</h2>
+<h3 id=main-results-and-implications>Main Results and Implications</h3>
+<p>Our project identified a unique metric to address both technical and social influences of packages in the npm system. By measuring Pearson ($R$) and Spearman ($\rho$) correlation coefficient between several metrics, we selected \textit{PageRank} and \textit{GitHub stars} to represent the technical and social impact of npm packages, and ranked 2,000 popular packages accordingly for vulnerability study.</p>
+<p>Our research studied top 2,000 npm packages and their vulnerabilities in past releases, from the perspectives of vulnerability discovery time, vulnerability dependency type, vulnerable types and severity. RQ3.1 reveals that most vulnerable were made to public after the packages were released, and a majority (75.4%) of vulnerable were introduced through \textbf{indirect dependency}. As the result for RQ3.2 highlighted, 5% of the vulnerabilities are immediately vulnerable, as the vulnerabilities was published mostly \textbf{within 6 months} before the packages were released. Lastly, RQ3.3 pointed out that both past releases and the most recent release \textbf{share the same set of the most frequency vulnerability types}: &ldquo;Regular Expression Denial of Service (ReDoS)&rdquo;, &ldquo;Prototype Pollution&rdquo;, and &ldquo;Arbitrary Code Injection&rdquo;, while the majority of vulnerabilities are in medium severity level.</p>
+<p>Also looking at the packages from the perspective of the type of vulnerability (e.g. Cross-site Scripting (XSS), Arbitrary Code Injection, etc.), we found that vulnerability types of HTTP Header Injection takes the longest to fix (2767 days) followed by Arbitrary Code Injection (2554 days), Improper Access Control (2360 days), Remote Code Execution (RCE) (2165 days) and Cross-Site Request Forgery (CSRF) (2062 days). The five most common vulnerability types that have the most options of being fixed by upgrading the vulnerable packages include Regular Expression Denial of Service (ReDoS), Prototype Pollution, Use After Free (UAF), Arbitrary Code Injection and Denial of Service (DoS). For open source packages, we can see that certain packages with vulnerabilities are not prioritized and fixed as efficiently as others. For example, certain outliers aside, NULL Pointer Dereference, Arbitrary File Write via Archive Extraction (Zip Slip), Uncontrolled Recursion, Out-of-bounds Read and Improper Input Validation are the worst maintained packages from the perspective of vulnerabilities being detected and not fixed with 300, 153, 84, 72 and 31 vulnerabilities not fixed for every vulnerability detected and fixed, respectively.</p>
+<p>The results of our vulnerability study have implications to both individual developers and npm community. For developers, it is important to notice that most vulnerabilities in project can be introduced through indirect dependency. Dependencies should be selected more carefully after a quick research of package vulnerability through public database, and immediate vulnerable packages should be avoided in the current project. However, security cannot be maintained through only individual effort, as projects cannot avoid dependencies and new vulnerabilities can be detected any time after the package was released. For packages that has vulnerabilities tracing through a long dependency chain, fixing such vulnerabilities can be difficult and costly for individuals. Therefore, we should raise the awareness of vulnerabilities introduced through indirect dependencies, and make collective efforts to address such issue in the npm community.</p>
+<h3 id=strength-and-limitations>Strength and Limitations</h3>
+<p>Our project presented unique metric to account for technical and social influences of npm packages, and conducted extensive study of the vulnerabilities among all $1.6M$ releases in the popular packages. We extended the prior research on vulnerability dependency by examining vulnerabilities not only due to self and direct dependencies, but also indirect dependency tracing back to root vulnerable packages. In addition to the dependency study, our results identified immediately vulnerable releases, and highlighted the most frequent vulnerability types in the release data, which provides good reference to researchers and developers who are interested in npm package development security and vulnerability trend study.</p>
+<p>Despite the great implications from results, our study is subject to limitations. Since we only used npm package data in the process of determining the popularity metrics, our metrics only apply to npm, while effectiveness in the context of other ecosystem is not measured. Additionally, our vulnerability analysis was based on popular npm packages, and the results highlighted are restricted to this regime only. Thus, the trend of vulnerability dependency types and frequent vulnerabilities may not apply to all npm packages and other ecosystems.</p>
+<h3 id=future-work>Future Work</h3>
+<h4 id=popularity-metrics>Popularity metrics</h4>
+<p>As mentioned by Zerouali et al. \cite{zerouali2019diversity}, popularity of packages can be measured in many different ways and each metric represent different points of view for measuring popularity. In our study, we focused on the vulnerabilities in dependency chains and used PageRank of dependency graph and the number of GitHub stars as popularity metrics. In different contexts, however, other metrics can be used to identify popular packages.</p>
+<h4 id=cross-source-discrepancies>Cross-source discrepancies</h4>
+<p>The full dependency data is from Libraries.io while the vulnerability data is from Snyk DB. The difference in data source resulted in a discrepancy between npm package name and version name. Furthermore, the project and dependency data from Libraries.io needs cleaning up for mismatching attributes. To fix this, we introduced a complex function to link the two dataset, but the effect is not good enough as only 47.8% of dependencies between projects are matched. The next step is to either find a reliable source to download the full dependency data and vulnerability data from one dataset (e.g. npm APIs), or to polish the link function.</p>
+<h4 id=package-definitions-and-vulnerability-classification>Package definitions and vulnerability classification</h4>
+<p>When accessing GitHub and GitHub-derived data from other sources such as libraries.io, Google BigQuery Open Datasets, etc. an interesting pattern emerges - not all packages are listed atomically in a GitHub repository. For example, while \verb|airbnb| javascript packages \verb|eslint-config-airbnb-base| and \verb|eslint-config-airbnb| are listed as two distinct packages in npm, on GitHub they are listed under the same repository (\verb|github.com/airbnb/javascript/tree/master/packages|) with the two packages under the same directory \verb|packages|. This is probably due to the fact that these two packages share common code-base. However, it becomes difficult to delineate the popularity, vulnerabilities, activities, etc. between them from GitHub alone, and would require more sophisticated data extraction methodologies combining data from multiple sources to get a more reliable and accurate dataset to work with. This is something that can be considered and incorporated in future iterations.</p>
+<h4 id=dependency-study>Dependency study</h4>
+<p>Our project only focused on vulnerabilities and their dependency relations back to the vulnerable root packages, while the impact of the vulnerabilities in popular packages to its dependents was not studied due to the cost of building such dependency graph. As mentioned by Zimmermann et al. \cite{zimmermann2019small}, the indirect dependency between projects increases super-linearly, which make the analysis through a complete dependency graph of npm packages hard to proceed. One idea to simplify this time consuming process is pruning. However, the top popular projects are transitively depended on by a fairly large part of all projects, thus the cost of building such big dependency graph is too high for the limited time. We plan to research more optimized graph search algorithms to speed up the graph analysis.</p>
+<h4 id=extending-study-to-other-ecosystems>Extending study to other ecosystems</h4>
+<p>Our dataset was restricted to the packages within npm. In practice, the JavaScript ecosystem is much larger and there are many other kinds of programming languages in use having their own ecosystems. Reproducing our research study within different ecosystems will reveal vulnerability patterns for popular packages in individual ecosystems. Extending the study to other ecosystems also makes it possible to investigate vulnerabilities in dependencies to heterogeneous ecosystems, which was not covered in our study. Considering such a broad view of dependency chain will further highlight the importance of collective effort for security.</p>
+<h2 id=about-the-team>About the team</h2>
+<p>This product was conceived and developed as part of our coursework for the Fall 2021 class ECS 260: Emperical Software Engineering taught by
+<span class=link-wrapper>
+<a href=https://www.cs.ucdavis.edu/~filkov/ target=_blank>
+Prof. Vladimir Filkov
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+at the
+<span class=link-wrapper>
+<a href=https://www.ucdavis.edu/ target=_blank>
+University of California, Davis
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+. Our team consists of following members:</p>
+<ol>
+<li>Vasudha Jha (
+<a href=mailto:vajha@ucdavis.edu>
+vajha@ucdavis.edu
+</a>
+)</li>
+<li>Nan Ma (
+<a href=mailto:mnama@ucdavis.edu>
+mnama@ucdavis.edu
+</a>
+)</li>
+<li>Parichaya Chatterji (
+<a href=mailto:parichay@ucdavis.edu>
+parichay@ucdavis.edu
+</a>
+)</li>
+<li>Jinyoung Pung (
+<a href=mailto:jpung@ucdavis.edu>
+jpung@ucdavis.edu
+</a>
+)</li>
+<li>Qifan Ren (
+<a href=mailto:qfren@ucdavis.edu>
+qfren@ucdavis.edu
+</a>
+)</li>
+</ol>
 </main>
 <script src=./assets/js/uwe-uwe.js type=text/javascript></script>
 <script type=text/javascript>UWE_UWE.FOOTNOTES.init(),UWE_UWE.TABS.init()</script></body>
