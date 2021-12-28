@@ -1,0 +1,11 @@
+---
+weight: 1
+title: "Introduction"
+draft: false
+---
+
+## Introduction
+
+One of the major security concerns with modern-day software applications is their strong dependency on Open Source Software (OSS) libraries. The vulnerabilities in the OSS libraries can be exploited by malicious cyber attacks, and threaten the security of dependent software. With strong dependency on OSS libraries, software applications continue to face malicious attacks due to the vulnerabilities discovered in OSS libraries. According to Synopsys Cybersecurity Research Center's (CyRC) "Open Source Security and Risk Analysis" (OSSRA) report in 2021, 98% of 1546 industry codebases audited rely on OSS libraries and 84% of them are subject to at least one public open source vulnerability, which is a 9% increase compared to 2020 \cite{Synopsys21}. Furthermore, vulnerabilities are found in both direct and indirect dependencies, where the majority of vulnerabilities found in Node.js, Java, and Ruby projects are introduced by indirect dependencies \cite{Snyk20}. Therefore, detecting vulnerabilities in OSS libraries through dependency analysis is crucial in preventing security attacks.
+
+Previous research has focused on studying different scopes to identify vulnerabilities introduced by OSS library dependency. For example, Decan et al. in 2018 used the metadata from 610k JavaScript packages to analyze the time and duration of vulnerabilities in those packages introduced by direct dependencies \cite{decan2018impact}. In parallel to Decan's work, Pashchenko et al. also used metadata to identify  vulnerabilities due to dependencies \cite{pashchenko2018vulnerable}. They published a framework on how to report vulnerable dependencies in OSS with a focus on the 200 most popular Java libraries. Taking a different approach than identifying vulnerabilities from metadata, in 2020, Ponta et al. developed a code-centric, usage-based vulnerable detection tool, \textit{Eclipse Steady}, to overcome the inaccurate release versions and unavailable vulnerability information from metadata \cite{ponta2020detection}. However, no studies have been done to count for vulnerabilities induced by both direct and indirect dependencies in JavaScript packages, especially as 86% of the npm projects are reported to be affected by vulnerabilities from indirect dependencies \cite{Snyk20}.
