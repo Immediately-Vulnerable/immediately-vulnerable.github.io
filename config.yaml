@@ -19,7 +19,7 @@ params:
 
         logo: 
             display: true
-            src: "/assets/img/logo.gif"
+            src: "/assets/img/logo3.gif"
 
         shortDesc: 
             display: false
