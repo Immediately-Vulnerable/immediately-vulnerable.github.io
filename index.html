@@ -199,26 +199,89 @@ Decan et al.
 surveyed 610K JavaScript packages to analyze how and when different vulnerabilities are discovered and fixed in the npm package dependency network, and to what extent do they affect other packages. The study reveals that <strong>it takes more than 2 years to discover 50% of the vulnerabilities</strong>, and an even longer time to discover low severity ones. In addition to the delay in detecting vulnerabilities, they concluded that <strong>more than 33% of affected dependent packages are not updated even if an upstream fix is available</strong> because of restrictive dependency constraints. We extended these aspects of their study by analyzing how vulnerable npm packages affect directly and indirectly dependent packages.</p>
 <h2 id=methodology>Methodology</h2>
 <h3 id=study-design>Study Design</h3>
-<p>We designed the experiment by first finding the top $N$ most important packages within the npm ecosystem, and then investigating the vulnerabilities in the selected packages.</p>
+<p>We designed the experiment by first finding the most important packages within the npm ecosystem, and then investigating the vulnerabilities in the selected packages.</p>
 <h4 id=identifying-important-packages>Identifying important packages</h4>
-<p>There are various popularity metrics for packages, making it challenging to decide what metrics should be used to select popular packages. Although those metrics show moderate correlation ($p = 0.57$) \cite{zerouali2019diversity}, each can be interpreted from a different point of view, and can also be measured in a different way. Therefore, we combined both \textit{social} aspect (e.g. the number of stars, forks and watchers on GitHub) and \textit{technical} aspect of popularity (e.g. download count and number of depending packages) to avoid any possible bias.</p>
+<p>There are various popularity metrics for packages, making it challenging to decide what metrics should be used to select popular packages. Although those metrics show moderate correlation (<em>p=0.57</em>), each can be interpreted from a different point of view, and can also be measured in a different way. Therefore, we combined both <em>social</em> aspect (e.g. the number of stars, forks and watchers on GitHub) and <em>technical</em> aspect of popularity (e.g. download count and number of depending packages) to avoid any possible bias.</p>
 <h4 id=identifying-vulnerabilities-and-dependency-analysis>Identifying Vulnerabilities and Dependency Analysis</h4>
-<p>Given a list of important packages, we searched for vulnerabilities by the name of each package on Snyk Advisor \cite{snykadvisor}. For npm, Snyk reports vulnerabilities not only in that very package and direct dependencies, but also transitive dependencies over all the versions published within npm \cite{Snyk20}. Vulnerabilities found are then categorized by the vulnerability types and severity levels for further analysis.</p>
+<p>Given a list of important packages, we searched for vulnerabilities by the name of each package on
+<span class=link-wrapper>
+<a href=https://snyk.io/advisor/ target=_blank>
+Snyk Advisor
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+. For npm, Snyk reports vulnerabilities not only in that very package and direct dependencies, but also transitive dependencies over all the versions published within npm. Vulnerabilities found are then categorized by the vulnerability types and severity levels for further analysis.</p>
 <h3 id=data-collection>Data Collection</h3>
-<p>For this project, we explored various sources of data, including \textit{Libraries.io}, \textit{npm}, \textit{GitHub} and \textit{Synk Vulnerability Database}, to investigate packages dependencies and vulnerabilities in the published packages within npm.</p>
+<p>For this project, we explored various sources of data, including
+<span class=link-wrapper>
+<a href=https://libraries.io/ target=_blank>
+Libraries.io
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+,
+<span class=link-wrapper>
+<a href=https://www.npmjs.com/ target=_blank>
+npm
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+,
+<span class=link-wrapper>
+<a href=https://github.com/ target=_blank>
+GitHub
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+and
+<span class=link-wrapper>
+<a href=https://security.snyk.io/ target=_blank>
+Synk Vulnerability Database
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+, to investigate packages dependencies and vulnerabilities in the published packages within npm.</p>
 <h4 id=librariesio-and-npm>Libraries.io and npm</h4>
-<p>Open Source Repository and Dependency Metadata dataset, or \textit{Libraries.io} \cite{jeremy_katz_2020_3626071}, includes metadata of packages (package name, version, list of dependencies, etc.) from 34 different package managers. We filtered data for packages published in npm to extract the required dependencies for them. This allowed us to investigate the relationships among packages without manually extracting information from \textit{.json} manifest file that stores the metadata of each npm package. In addition to \textit{Libraries.io}, we utilized npm as the source by querying all release metadata, including release name and timestamp, for each package of interest.</p>
+<p>Open Source Repository and Dependency Metadata dataset, or
+<span class=link-wrapper>
+<a href=https://libraries.io/ target=_blank>
+Libraries.io
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+, includes metadata of packages (package name, version, list of dependencies, etc.) from 34 different package managers. We filtered data for packages published in npm to extract the required dependencies for them. This allowed us to investigate the relationships among packages without manually extracting information from json manifest file that stores the metadata of each npm package. In addition to Libraries.io, we utilized
+<span class=link-wrapper>
+<a href=https://www.npmjs.com/ target=_blank>
+npm
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+as the source by querying all release metadata, including release name and timestamp, for each package of interest.</p>
 <h4 id=github>GitHub</h4>
-<p>Based on the data filtered for npm packages, we extracted GitHub stars, forks and watchers using GitHub APIs \cite{githubapi}. We combined these metrics to account for the \textit{social} influences in selecting popular npm packages for vulnerability analysis.</p>
+<p>Based on the data filtered for npm packages, we extracted GitHub stars, forks and watchers using GitHub APIs. We combined these metrics to account for the <em>social</em> influences in selecting popular npm packages for vulnerability analysis.</p>
 <h4 id=snyk-vulnerability-database>Snyk Vulnerability Database</h4>
-<p>We explored Snyk Vulnerability Database (Snyk DB) for identifying vulnerabilities in npm packages \cite{snykvdb}. The database allows users to use package name and optionally with package release name to search for known vulnerabilities in that package. To pipeline the querying process from Snyk, we developed an extractor in Python script to search a given npm package&rsquo;s vulnerability with package name, version, and GitHub URL through Snyk Command Line Interface (CLI) tool.</p>
+<p>We explored
+<span class=link-wrapper>
+<a href=https://security.snyk.io/ target=_blank>
+Snyk Vulnerability Database (Snyk DB)
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+for identifying vulnerabilities in npm packages. The database allows users to use package name and optionally with package release name to search for known vulnerabilities in that package. To pipeline the querying process from Snyk, we developed an extractor in Python to search a given npm package&rsquo;s vulnerability with package name, version, and GitHub URL through
+<span class=link-wrapper>
+<a href=https://docs.snyk.io/products/snyk-code/cli-for-snyk-code target=_blank>
+Snyk Command Line Interface (CLI)
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+tool.</p>
 <h3 id=variables-considered>Variables Considered</h3>
-<p>The two main tasks of the project, i.e. identifying popular npm packages and investigating their vulnerabilities, are concerned with different sets of variables and attributes from the data extracted. In order to extract popular npm packages from the \textit{Libraries.io} dataset, we considered their direct dependent package list, to examine the technical influence of each package. We also developed a tool to extract each package&rsquo;s stars, forks and watchers from their GitHub repositories to examine their social influence.</p>
+<p>The two main tasks of the project, i.e. identifying popular npm packages and investigating their vulnerabilities, are concerned with different sets of variables and attributes from the data extracted. In order to extract popular npm packages from the Libraries.io dataset, we considered their direct dependent package list, to examine the technical influence of each package. We also developed a tool to extract each package&rsquo;s stars, forks and watchers from their GitHub repositories to examine their social influence.</p>
 <p>To analyze the vulnerability of each popular package, specifically the vulnerability dependency types and discovery time, we divided the vulnerability information extraction into two phases. First, for all popular packages and their past releases, we scanned their basic vulnerable data by querying from Snyk whether a package release was vulnerable, their number of vulnerabilities, and the count of critical, high, medium, low severity vulnerabilities, if present. Then, for the releases that has vulnerabilities recorded, we further extracted detailed vulnerable attributes, including the disclosure and publication time of the vulnerabilities, the dependency path tracing back to the problematic source package, and the release name when the vulnerability was fixed.</p>
 <h3 id=analysis-methods>Analysis Methods</h3>
-<p>To compare the different metrics in searching for the ones that can best represent the social and technical aspect of the npm packages, we adopted the methods in the research of Zerouali et al. which computed Pearson ($R$) and Spearman ($\rho$) correlation factors across different popularity metrics \cite{zerouali2019diversity}. Using the threshold cutoff relation of $0 &lt; \textit{very weak} \leq 0.2 &lt; \textit{weak} \leq 0.4 &lt; \textit{moderate} \leq 0.6 &lt; \textit{moderately strong} \leq 0.8 &lt; \textit{strong} \leq 1$, we compared the similarities between the candidate metrics to decide if the correlation between any metric is strong enough to demonstrate the influence of the packages.</p>
-<p>Our analysis of vulnerabilities in a package can be divided into several steps: if the package has any vulnerabilities, then finding the discovery time of such vulnerabilities, the type of vulnerable dependency, and the severity level. To check if the package and its release have any vulnerabilities, we first queried the vulnerability in a form of json file from Snyk using the package name and its release we obtained from npm, and extracted the node \verb|ok| in the json to determine if any vulnerability was recorded.</p>
-<p>For every vulnerability found, the discovery time of each can be associated by either \verb|disclosureTime|, the time the vulnerable was first disclosed, or \verb |publicationTime|, the time the vulnerable was publicly announced. In our research, we adopted the \verb|publicationTime| instead of \verb|disclosureTime| since the former is a more accurate measure of when a release is publicly know to be vulnerable than the latter. The vulnerability dependency type can be analyzed by the node \verb|from| which listed the source of vulnerability through the dependency. If \verb|from| has only one package, then the vulnerable dependency comes from the package itself. Similarly, if \verb|from| has two packages, then vulnerability arises from direct dependencies too, while more than two packages indicates the vulnerability in a release arises from indirect dependencies as well. Lastly, the severity of the vulnerability is highlighted by the node \verb|severity| in Snyk DB, ranging from critical, high, medium, to low. Once all these attributes are tabulated for each vulnerability in all packages, we aggregated the statistics using histograms and box plots to answer RQ3.</p>
+<p>To compare the different metrics in searching for the ones that can best represent the social and technical aspect of the npm packages, we adopted the methods in the research of Zerouali et al. which computed Pearson (<em>R</em>) and Spearman (<em>ρ</em>) correlation factors across different popularity metrics. Using the threshold cutoff relation of 0 &lt; <em>very weak</em> ≤ 0.2 &lt; <em>weak</em> ≤ 0.4 &lt; <em>moderate</em> ≤ 0.6 &lt; <em>moderately strong</em> ≤ 0.8 &lt; <em>strong</em> ≤ 1, we compared the similarities between the candidate metrics to decide if the correlation between any metric is strong enough to demonstrate the influence of the packages.</p>
+<p>Our analysis of vulnerabilities in a package can be divided into several steps: if the package has any vulnerabilities, then finding the discovery time of such vulnerabilities, the type of vulnerable dependency, and the severity level. To check if the package and its release have any vulnerabilities, we first queried the vulnerability in a form of json file from Snyk using the package name and its release we obtained from npm, and extracted the value of <code>ok</code> in the json to determine if any vulnerability was recorded.</p>
+<p>For every vulnerability found, the discovery time of each can be associated by either <code>disclosureTime</code>, the time the vulnerable was first disclosed, or <code>publicationTime</code>, the time the vulnerable was publicly announced. In our research, we adopted the <code>publicationTime</code> instead of <code>disclosureTime</code> since the former is a more accurate measure of when a release is publicly known to be vulnerable than the latter. The vulnerability dependency type can be analyzed by the node <code>from</code> which listed the source of vulnerability through the dependency. If <code>from</code> has only one package, then the vulnerable dependency comes from the package itself. Similarly, if <code>from</code> has two packages, then vulnerability arises from direct dependencies too, while more than two packages indicates the vulnerability in a release arises from indirect dependencies as well. Lastly, the severity of the vulnerability is highlighted by the node <code>severity</code> in Snyk DB, ranging from critical, high, medium, to low. Once all these attributes are tabulated for each vulnerability in all packages, we aggregated the statistics using histograms and box plots to answer RQ3.</p>
 <h2 id=results>Results</h2>
 <h3 id=rq1-which-aspects-and-metrics-should-be-considered-when-determining-the-popularity-of-npm-oss-packages>RQ1: Which aspects and metrics should be considered when determining the popularity of npm OSS packages?</h3>
 <p>Popularity can be defined and measured in various ways. Thus, each study needs to rely on study-specific popularity metrics considering the context of popularity. In our project, we investigated both \textit{technical} and \textit{social} aspects of popularity \cite{zerouali2019diversity} and selected one metric from each aspect. Finally, we derived the top $N$ popular packages by combining these two different metrics.</p>
