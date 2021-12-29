@@ -11,7 +11,7 @@
 <body>
 <header id=page-header>
 <div id=page-logo-wrapper>
-<img id=page-logo alt="Uwe Uwe Logo" src=./assets/img/logo.gif width=150 height=150>
+<img id=page-logo alt="Uwe Uwe Logo" src=./assets/img/logo3.gif width=150 height=150>
 </div>
 <h1 id=page-title>Investigating the Chain of Vulnerabilities in Popular npm Open Source Software</h1>
 <ul id=page-platform-links class=as-icons-and-text>
@@ -38,10 +38,101 @@
 </nav>
 <main id=page-content>
 <h2 id=introduction>Introduction</h2>
-<p>One of the major security concerns with modern-day software applications is their strong dependency on Open Source Software (OSS) libraries. The vulnerabilities in the OSS libraries can be exploited by malicious cyber attacks, and threaten the security of dependent software. With strong dependency on OSS libraries, software applications continue to face malicious attacks due to the vulnerabilities discovered in OSS libraries. According to Synopsys Cybersecurity Research Center&rsquo;s (CyRC) &ldquo;Open Source Security and Risk Analysis&rdquo; (OSSRA) report in 2021, 98% of 1546 industry codebases audited rely on OSS libraries and 84% of them are subject to at least one public open source vulnerability, which is a 9% increase compared to 2020 \cite{Synopsys21}. Furthermore, vulnerabilities are found in both direct and indirect dependencies, where the majority of vulnerabilities found in Node.js, Java, and Ruby projects are introduced by indirect dependencies \cite{Snyk20}. Therefore, detecting vulnerabilities in OSS libraries through dependency analysis is crucial in preventing security attacks.</p>
-<p>Previous research has focused on studying different scopes to identify vulnerabilities introduced by OSS library dependency. For example, Decan et al. in 2018 used the metadata from 610k JavaScript packages to analyze the time and duration of vulnerabilities in those packages introduced by direct dependencies \cite{decan2018impact}. In parallel to Decan&rsquo;s work, Pashchenko et al. also used metadata to identify vulnerabilities due to dependencies \cite{pashchenko2018vulnerable}. They published a framework on how to report vulnerable dependencies in OSS with a focus on the 200 most popular Java libraries. Taking a different approach than identifying vulnerabilities from metadata, in 2020, Ponta et al. developed a code-centric, usage-based vulnerable detection tool, \textit{Eclipse Steady}, to overcome the inaccurate release versions and unavailable vulnerability information from metadata \cite{ponta2020detection}. However, no studies have been done to count for vulnerabilities induced by both direct and indirect dependencies in JavaScript packages, especially as 86% of the npm projects are reported to be affected by vulnerabilities from indirect dependencies \cite{Snyk20}.</p>
+<p>One of the major security concerns with modern-day software applications is their strong dependency on Open Source Software (OSS) libraries. The vulnerabilities in the OSS libraries can be exploited by malicious cyber attacks, and threaten the security of dependent software. With strong dependency on OSS libraries, software applications continue to face malicious attacks due to the vulnerabilities discovered in OSS libraries.</p>
+<p>According to
+<span class=link-wrapper>
+<a href=https://www.synopsys.com/ target=_blank>
+Synopsys Cybersecurity Research Center&rsquo;s (CyRC)
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+<span class=link-wrapper>
+<a href=https://www.synopsys.com/software-integrity/resources/analyst-reports/open-source-security-risk-analysis.html target=_blank>
+Open Source Security and Risk Analysis (OSSRA) report in 2021
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+, 98% of 1546 industry codebases audited rely on OSS libraries and 84% of them are subject to at least one public open source vulnerability, which is a 9% increase compared to 2020. Furthermore, according to Snyk&rsquo;s
+<span class=link-wrapper>
+<a href=https://snyk.io/open-source-security/ target=_blank>
+The State of Open Source Security 2020
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+report, vulnerabilities are found in both direct and indirect dependencies, where the majority of vulnerabilities found in Node.js, Java, and Ruby projects are introduced by indirect dependencies. Therefore, <strong>detecting vulnerabilities in OSS libraries through dependency analysis is crucial in preventing security attacks</strong>.</p>
+<div aria-label="notification - info" class="notification info">
+<img alt="info icon" src=./assets/img/icons/info-icon.png height=48 width=48>
+<div>
+<b>98%</b> of industry codebases audited rely on open-source libraries and <b>84%</b> of them are subject to at least one public open source vulnerability.
+</div>
+</div>
+<p>Previous research has focused on studying different scopes to identify vulnerabilities introduced by OSS library dependency. For example, Decan et al. in their 2018 paper
+<span class=link-wrapper>
+<a href=https://dl.acm.org/doi/pdf/10.1145/3196398.3196401 target=_blank>
+&ldquo;On the impact of security vulnerabilities in the npm package dependency network&rdquo;
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+used the metadata from 610K JavaScript packages to analyze the time and duration of vulnerabilities in those packages introduced by direct dependencies.</p>
+<p>In parallel to Decan&rsquo;s work, Pashchenko et al. in their paper
+<span class=link-wrapper>
+<a href=https://www.researchgate.net/profile/Antonino-Sabetta/publication/328089558_Vulnerable_open_source_dependencies_counting_those_that_matter/links/5bd88e2da6fdcc3a8db16906/Vulnerable-open-source-dependencies-counting-those-that-matter.pdf target=_blank>
+&ldquo;Vulnerable Open Source Dependencies: Counting Those That Matter&rdquo;
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+also used metadata to identify vulnerabilities due to dependencies. They published a framework on how to report vulnerable dependencies in OSS with a focus on the 200 most popular Java libraries.</p>
+<p>Taking a different approach than identifying vulnerabilities from metadata, in 2020,
+<span class=link-wrapper>
+<a href=https://link.springer.com/content/pdf/10.1007/s10664-020-09830-x.pdf target=_blank>
+Ponta et al.
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+developed a code-centric, usage-based vulnerable detection tool,
+<span class=link-wrapper>
+<a href=https://projects.eclipse.org/proposals/eclipse-steady target=_blank>
+Eclipse Steady
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+, to overcome the inaccurate release versions and unavailable vulnerability information from metadata.</p>
+<p>However, no studies have been done to count for vulnerabilities induced by both direct and indirect dependencies in JavaScript npm packages, especially as 86% of the npm projects are reported to be affected by vulnerabilities from indirect dependencies according to Snyk&rsquo;s
+<span class=link-wrapper>
+<a href=https://snyk.io/open-source-security/ target=_blank>
+The State of Open Source Security 2020
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+report.</p>
+<div aria-label="notification - info" class="notification info">
+<img alt="info icon" src=./assets/img/icons/info-icon.png height=48 width=48>
+<div>
+Our project is the first of its kind to analyze vulnerabilities caused by both direct and indirect dependencies in npm packages.
+</div>
+</div>
 <h2 id=research-questions>Research Questions</h2>
-<p>There are a handful of studies focusing on vulnerabilities in OSS projects through dependency analysis. The study from Decan et al. \cite{decan2018impact}, introduced in the previous section, inspired our project. We extended their vulnerable dependency study to include vulnerabilites due to three dependency types: vulnerability arising from the package itself (\textit{self}), vulnerability from one or more direct dependencies (\textit{direct}), and vulnerabilities from one or more indirect dependencies through a dependency chain (\textit{indirect}). The study from Pashchenko et al. \cite{pashchenko2018vulnerable} built up a framework to trace the vulnerabilities through direct and indirect dependency, which we adopted in our study as the ground work. Lastly, no prior study has focused on identifying the immediate vulnerable OSS packages, which upon the release time had known vulnerable dependencies, either direct or indirect. Therefore, in addition to categorizing the vulnerability dependency, we also diagnosed if the package has immediate vulnerabilities.</p>
+<p>There are a handful of studies focusing on vulnerabilities in OSS projects through dependency analysis. The study from
+<span class=link-wrapper>
+<a href=https://dl.acm.org/doi/pdf/10.1145/3196398.3196401 target=_blank>
+Decan et al.
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+, introduced in the previous section, inspired our project. We extended their vulnerable dependency study to include vulnerabilites due to three dependency types: vulnerability arising from the package itself (<em>self</em>), vulnerability from one or more direct dependencies (<em>direct</em>), and vulnerabilities from one or more indirect dependencies through a dependency chain (<em>indirect</em>). The study from
+<span class=link-wrapper>
+<a href=https://www.researchgate.net/profile/Antonino-Sabetta/publication/328089558_Vulnerable_open_source_dependencies_counting_those_that_matter/links/5bd88e2da6fdcc3a8db16906/Vulnerable-open-source-dependencies-counting-those-that-matter.pdf target=_blank>
+Pashchenko et al.
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+built up a framework to trace the vulnerabilities through direct and indirect dependency, which we adopted in our study as the ground work.</p>
+<div aria-label="notification - info" class="notification info">
+<img alt="info icon" src=./assets/img/icons/info-icon.png height=48 width=48>
+<div>
+No prior study has focused on identifying the immediate vulnerable OSS packages, which upon the release time had known vulnerable dependencies, either direct or indirect. Therefore, in addition to categorizing the vulnerability dependency, we also diagnosed if the package was immediate vulnerable upon release.
+</div>
+</div>
 <p>Our overall goal for this project was to perform empirical research and vulnerable dependency analysis of popular OSS projects and libraries within the npm ecosystem, with the following specific research questions:</p>
 <ol>
 <li>Which aspects and metrics should be considered when determining the popularity of npm OSS packages?</li>
@@ -61,9 +152,9 @@
 <li>We determined the top 2,000 packages to represent the most-influential npm packages since vulnerabilities found in these packages will have a widespread impact.</li>
 <li>We highlighted the vulnerabilities among top 2,000 npm packages and their past releases based on
 <ul>
-<li>Vulnerability discovery time: Whether the vulnerability in a dependency of the package was published before or after the release of that package. If the vulnerability in the dependency was published before the release of the package, then the package is said to be \textit{immediately vulnerable}.</li>
-<li>Vulnerability dependency: if the vulnerability is within the package itself (\textit{self}), directly depending on a vulnerable package (\textit{direct}), or depending on a vulnerable package through a dependency chain (\textit{indirect}).</li>
-<li>Vulnerability types and severity levels (\textit{critical}, \textit{high}, \textit{medium}, or \textit{low}).</li>
+<li>Vulnerability discovery time: Whether the vulnerability in a dependency of the package was published before or after the release of that package. If the vulnerability in the dependency was published before the release of the package, then the package is said to be <em>immediately vulnerable</em>.</li>
+<li>Vulnerability dependency: if the vulnerability is within the package itself (<em>self</em>), directly depending on a vulnerable package (<em>direct</em>), or depending on a vulnerable package through a dependency chain (<em>indirect</em>).</li>
+<li>Vulnerability types and severity levels (<em>critical</em>, <em>high</em>, <em>medium</em>, or <em>low</em>).</li>
 </ul>
 </li>
 </ul>
