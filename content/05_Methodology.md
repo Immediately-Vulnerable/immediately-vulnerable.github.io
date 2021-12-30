@@ -12,7 +12,7 @@ We designed the experiment by first finding the most important packages within t
 
 #### Identifying important packages
 
-There are various popularity metrics for packages, making it challenging to decide what metrics should be used to select popular packages. Although those metrics show moderate correlation (*p=0.57*), each can be interpreted from a different point of view, and can also be measured in a different way. Therefore, we combined both *social* aspect (e.g. the number of stars, forks and watchers on GitHub) and *technical* aspect of popularity (e.g. download count and number of depending packages) to avoid any possible bias.
+There are various popularity metrics for packages, making it challenging to decide what metrics should be used to select popular packages. Although those metrics show moderate correlation (*p = 0.57*), each can be interpreted from a different point of view, and can also be measured in a different way. Therefore, we combined both *social* aspect (e.g. the number of stars, forks and watchers on GitHub) and *technical* aspect of popularity (e.g. download count and number of depending packages) to avoid any possible bias.
 
 #### Identifying Vulnerabilities and Dependency Analysis
 
