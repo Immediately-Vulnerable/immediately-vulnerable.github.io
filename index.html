@@ -172,7 +172,7 @@ Zerouali et al.
 </a>
 <img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
 </span>
-computed Spearman (ρ) correlation factors between 9 different popularity metrics for a large dataset of 175K npm packages. Indeed, they found that many popularity metrics are not strongly correlated (ρ=0.57), which implies that the use of different metrics may produce different outcomes. This result clearly shows that the context of popularity should be considered when we select popularity metrics for a specific study.</p>
+computed Spearman (ρ) correlation factors between 9 different popularity metrics for a large dataset of 175K npm packages. Indeed, they found that many popularity metrics are not strongly correlated (ρ = 0.57), which implies that the use of different metrics may produce different outcomes. This result clearly shows that the context of popularity should be considered when we select popularity metrics for a specific study.</p>
 <p>One of the most important aspects of our research is understanding how to properly define vulnerable open source dependencies and how to use a precise, constructive and empirical approach to vulnerability measurement. The research by
 <span class=link-wrapper>
 <a href=https://www.researchgate.net/profile/Antonino-Sabetta/publication/328089558_Vulnerable_open_source_dependencies_counting_those_that_matter/links/5bd88e2da6fdcc3a8db16906/Vulnerable-open-source-dependencies-counting-those-that-matter.pdf target=_blank>
@@ -201,7 +201,7 @@ surveyed 610K JavaScript packages to analyze how and when different vulnerabilit
 <h3 id=study-design>Study Design</h3>
 <p>We designed the experiment by first finding the most important packages within the npm ecosystem, and then investigating the vulnerabilities in the selected packages.</p>
 <h4 id=identifying-important-packages>Identifying important packages</h4>
-<p>There are various popularity metrics for packages, making it challenging to decide what metrics should be used to select popular packages. Although those metrics show moderate correlation (<em>p=0.57</em>), each can be interpreted from a different point of view, and can also be measured in a different way. Therefore, we combined both <em>social</em> aspect (e.g. the number of stars, forks and watchers on GitHub) and <em>technical</em> aspect of popularity (e.g. download count and number of depending packages) to avoid any possible bias.</p>
+<p>There are various popularity metrics for packages, making it challenging to decide what metrics should be used to select popular packages. Although those metrics show moderate correlation (<em>p = 0.57</em>), each can be interpreted from a different point of view, and can also be measured in a different way. Therefore, we combined both <em>social</em> aspect (e.g. the number of stars, forks and watchers on GitHub) and <em>technical</em> aspect of popularity (e.g. download count and number of depending packages) to avoid any possible bias.</p>
 <h4 id=identifying-vulnerabilities-and-dependency-analysis>Identifying Vulnerabilities and Dependency Analysis</h4>
 <p>Given a list of important packages, we searched for vulnerabilities by the name of each package on
 <span class=link-wrapper>
@@ -284,21 +284,35 @@ tool.</p>
 <p>For every vulnerability found, the discovery time of each can be associated by either <code>disclosureTime</code>, the time the vulnerable was first disclosed, or <code>publicationTime</code>, the time the vulnerable was publicly announced. In our research, we adopted the <code>publicationTime</code> instead of <code>disclosureTime</code> since the former is a more accurate measure of when a release is publicly known to be vulnerable than the latter. The vulnerability dependency type can be analyzed by the node <code>from</code> which listed the source of vulnerability through the dependency. If <code>from</code> has only one package, then the vulnerable dependency comes from the package itself. Similarly, if <code>from</code> has two packages, then vulnerability arises from direct dependencies too, while more than two packages indicates the vulnerability in a release arises from indirect dependencies as well. Lastly, the severity of the vulnerability is highlighted by the node <code>severity</code> in Snyk DB, ranging from critical, high, medium, to low. Once all these attributes are tabulated for each vulnerability in all packages, we aggregated the statistics using histograms and box plots to answer RQ3.</p>
 <h2 id=results>Results</h2>
 <h3 id=rq1-which-aspects-and-metrics-should-be-considered-when-determining-the-popularity-of-npm-oss-packages>RQ1: Which aspects and metrics should be considered when determining the popularity of npm OSS packages?</h3>
-<p>Popularity can be defined and measured in various ways. Thus, each study needs to rely on study-specific popularity metrics considering the context of popularity. In our project, we investigated both \textit{technical} and \textit{social} aspects of popularity \cite{zerouali2019diversity} and selected one metric from each aspect. Finally, we derived the top $N$ popular packages by combining these two different metrics.</p>
+<p>Popularity can be defined and measured in various ways. Thus, each study needs to rely on study-specific popularity metrics considering the context of popularity. In our project, we investigated both <em>technical</em> and <em>social</em> aspects of popularity and selected one metric from each aspect. Finally, we derived the top $N$ popular packages by combining these two different metrics.</p>
 <h4 id=technical-aspect>Technical aspect</h4>
 <p>The more dependents packages have, the greater effect their vulnerabilities. This is because a package&rsquo;s vulnerability can be disseminated throughout their dependents. In this context, the number of dependents is one of the important metrics in the technical aspect of popularity in our project. However, simply using this as a metric may fall into a pitfall since it does not take the chain of dependencies into account.</p>
-<p>For example, let&rsquo;s consider a 8-node dependency graph. In Figure \ref{fig:simple_graph}, each node represents a package, and an edge from package \textit{u} to package \textit{v} represents that \textit{u} is a dependent of \textit{v}. The example graph shows that the number of dependents only captures the direct neighbors of each node, thus implicitly important packages may have low values. Although the in-degree, which is the number of dependents, of package \textit{A} is only 1, it is clear that executing any of packages \textit{B, D, E, F, G} and \textit{H} results in executing package \textit{A}.</p>
+<p>For example, let&rsquo;s consider a 8-node dependency graph. In the figure below, each node represents a package, and an edge from package <em>u</em> to package <em>v</em> represents that <em>u</em> is a dependent of <em>v</em>. The example graph shows that the number of dependents only captures the direct neighbors of each node, thus implicitly important packages may have low values. Although the in-degree, which is the number of dependents, of package <em>A</em> is only 1, it is clear that executing any of packages <em>B, D, E, F, G</em> and <em>H</em> results in executing package <em>A</em>.</p>
 <p align=center>
 <img src=./assets/img/simple_dep_graph.png alt=tag width=100%>
 </p>
 <p class=caption>
 <i>8-node dependency graph</i>
 </p>
-<p>To take transitive dependency into account, we computed \textit{PageRank} \cite{page1999pagerank} of the dependency graph. PageRank algorithm gives more weight on the edge of relatively important nodes. Thus, in Figure \ref{fig:simple_graph}, even if package \textit{A} has only one dependent package \textit{B}, package \textit{A} has the highest PageRank since its dependent has many other dependents.</p>
-<p>We measured Pearson ($R$) and Spearman ($\rho$) correlation coefficient between \textit{dependent projects count} and \textit{PageRank} of packages. We observed strong non-linear correlations between them ($\rho=0.40, R=0.87$) and decided it is high enough to select one metric on behalf of the other one. Thus \textit{PageRank} is finally selected as a single metric for the technical aspect of popularity metric.</p>
+<p>To take transitive dependency into account, we computed
+<span class=link-wrapper>
+<a href=http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf target=_blank>
+PageRank
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+of the dependency graph. The PageRank algorithm gives more weight on the edge of relatively important nodes. Thus, in the above figure, even if package <em>A</em> has only one dependent package <em>B</em>, package <em>A</em> has the highest PageRank since its dependent has many other dependents.</p>
+<p>We measured Pearson (<em>R</em>) and Spearman (<em>ρ</em>) correlation coefficient between <em>dependent projects count</em> and <em>PageRank</em> of packages. We observed strong non-linear correlations between them (<em>ρ = 0.40, R = 0.87</em>) and decided it is high enough to select one metric on behalf of the other one. Thus, PageRank is finally selected as a single metric for the technical aspect of popularity metric.</p>
 <h4 id=social-aspect>Social aspect</h4>
-<p>Al-Rubaye et al. surveyed several mechanisms for scoring popularity among GitHub repositories \cite{al2020scoring}. They mention starring, forking and watching repositories as the most common mechanisms for \textit{liking} content and providing social media style interactions on GitHub. Thus, in context of social aspects, we used these metrics to measure popularity.</p>
-<p>We measured the Pearson ($\rho$) and Spearman ($R$) correlation coefficients for the number of \textit{watchers}, \textit{forks} and \textit{stars}. Table \ref{table:github_stats_correlation} shows the correlations for these GitHub popularity metrics. We observed strong linear correlations between the three popularity metrics. Therefore, we decided to only use the number of stars to determine the top-N popular packages.</p>
+<p>
+<span class=link-wrapper>
+<a href=https://arxiv.org/pdf/2011.04865.pdf target=_blank>
+Al-Rubaye et al.
+</a>
+<img src=./assets/img/icons/external-link-icon.svg height=12 width=12>
+</span>
+surveyed several mechanisms for scoring popularity among GitHub repositories. They mention starring, forking and watching repositories as the most common mechanisms for <em>liking</em> content and providing social media style interactions on GitHub. Thus, in context of social aspects, we used these metrics to measure popularity.</p>
+<p>We measured the Pearson (<em>ρ</em>) and Spearman (<em>R</em>) correlation coefficients for the number of <em>watchers</em>, <em>forks</em> and <em>stars</em>. The table below shows the correlations for these GitHub popularity metrics.</p>
 <table>
 <thead>
 <tr>
@@ -311,66 +325,67 @@ tool.</p>
 <tbody>
 <tr>
 <td style=text-align:center><b>#watchers</b></td>
-<td style=text-align:center>$\rho=1.00$<br>$R=1.00$</td>
-<td style=text-align:center>$\rho=0.76$<br>$R=0.92$<br><b><i>strong</i></b></td>
-<td style=text-align:center>$\rho=0.91$<br>$R=0.91$<br><b><i>strong</i></b></td>
+<td style=text-align:center><em>ρ</em> = 1.00<br><em>R = 1.00</em></td>
+<td style=text-align:center><em>ρ</em> = 0.76<br><em>R = 0.92</em><br><b><i>strong</i></b></td>
+<td style=text-align:center><em>ρ</em> = 0.91<br><em>R = 0.91</em><br><b><i>strong</i></b></td>
 </tr>
 <tr>
 <td style=text-align:center><b>#forks</b></td>
 <td style=text-align:center></td>
-<td style=text-align:center>$\rho=1.00$<br>$R=1.00$</td>
-<td style=text-align:center>$\rho=0.79$<br>$R=0.96$<br><b><i>strong</i></b></td>
+<td style=text-align:center><em>ρ</em> = 1.00<br><em>R = 1.00</em></td>
+<td style=text-align:center><em>ρ</em> = 0.79<br><em>R = 0.96</em><br><b><i>strong</i></b></td>
 </tr>
 <tr>
 <td style=text-align:center><b>#stars</b></td>
 <td style=text-align:center></td>
 <td style=text-align:center></td>
-<td style=text-align:center>$\rho=1.00$<br>$R=1.00$</td>
+<td style=text-align:center><em>ρ</em> = 1.00<br><em>R = 1.00</em></td>
 </tr>
 </tbody>
 </table>
 <p class=caption>
 <i>Pearson and Spearman correlation coefficients for GitHub popularity metrics</i>
 </p>
+<p>We observed strong linear correlations between the three popularity metrics. Therefore, we decided to only use the number of stars to determine the top-N popular packages.</p>
 <h3 id=rq2-how-many-vulnerable-npm-packages-should-we-consider-for-our-research-study-and-why>RQ2: How many vulnerable npm packages should we consider for our research study and why?</h3>
-<p>To determine the value of $N$ for the top $N$ npm packages for our study, we closely examined the distribution of the two popularity metrics, PageRank and Github repository stars.</p>
-<p>Starting with PageRank, left of Figure \ref{Fig:PageRank_Stars_Distribution} shows the calculated PageRank value with respect to the corresponding package rank. The PageRank value demonstrates a beyond exponential decrease as the package rank is increasing. Thus, selecting only top 5,000, shown by the vertical red line in the figure, PageRank packages is sufficient for covering the popular package from the technical aspect.</p>
+<p>To determine the count of the top npm packages for our study, we closely examined the distribution of the two popularity metrics, PageRank and Github repository stars.</p>
+<p>Starting with PageRank, the left graph in the figure below shows the calculated PageRank value with respect to the corresponding package rank. The PageRank value demonstrates a beyond exponential decrease as the package rank is increasing. Thus, selecting only top 5,000 shown by the vertical red line in the figure, PageRank packages is sufficient for covering the popular package from the technical aspect.</p>
 <p align=center>
 <img src=./assets/img/threshold_cutoff.png alt=tag width=100%>
 </p>
 <p class=caption>
 <i>PageRank (left) and GitHub stars (right) distribution with respect to Package's Popularity Rank</i>
 </p>
-<p>We fetched GitHub repositories for the top 5,000 packages ranked by PageRank and sorted the package list again to account for the social influence of the package. Similar to the PageRank, the distribution of packages' GitHub star number in the right of Figure \ref{Fig:PageRank_Stars_Distribution} declined exponentially as the package order increases. As highlighted by the red vertical line in the same plot, choosing $N = 2000$ as a threshold can capture the popular npm packages from both technical and social perspective, while keeping the dataset in a reasonable size.</p>
+<p>We fetched GitHub repositories for the top 5,000 packages ranked by PageRank and sorted the package list again to account for the social influence of the package. Similar to the PageRank, the distribution of packages' GitHub star number in the right of the figure declined exponentially as the package order increases. As highlighted by the red vertical line in the same plot, choosing <em>N = 2,000</em> as a threshold can capture the popular npm packages from both technical and social perspective, while keeping the dataset in a reasonable size.</p>
 <h3 id=rq3-analyzing-vulnerabilities-in-popular-vulnerable-npm-packages>RQ3: Analyzing vulnerabilities in popular vulnerable npm packages</h3>
 <p>The top 2,000 npm packages selected yields 231,488 releases in total, with the earliest dated back to 2010. Among these, 60.6% releases do not have known vulnerabilities, 38.8% have one or more vulnerabilities, and 0.695% releases do not have data from Snyk DB. By examining the data that does not have record at Snyk DB, we discovered that these are either old or preview releases and does not concern with our purpose of study, and thus the 0.695% , or 1609 releases, was removed from our data.</p>
 <p>Between the packages with vulnerabilities, there are in total 864 packages and 89,658 releases, resulting in 1,654,568 vulnerabilities for further analysis. The sections 4.3.1 through 4.3.3 address the study of scanning vulnerability discovery time, zooming into immediate vulnerable, and ranking the top vulnerable types and severity levels.</p>
 <h4 id=when-are-vulnerabilities-discovered-and-what-are-their-distributions-with-respect-to-vulnerability-dependency-types-and-severity-levels>When are vulnerabilities discovered, and what are their distributions with respect to vulnerability dependency types and severity levels?</h4>
-<p>We first began by surveying the vulnerability type of all 1,654,568 vulnerabilities to decide if the vulnerability was introduced within the package itself (self), from a directly dependent package (direct), or from depending on a vulnerable root package through a chain (indirect). The statistics revealed that \textbf{most vulnerabilities (75.4%) were introduced from indirect dependency}, with the rest 18.5% from direct dependency, and only a small portion (6.19%) was from package itself.</p>
+<p>We first began by surveying the vulnerability type of all 1,654,568 vulnerabilities to decide if the vulnerability was introduced within the package itself (self), from a directly dependent package (direct), or from depending on a vulnerable root package through a chain (indirect). The statistics revealed that <strong>most vulnerabilities (75.4%) were introduced from indirect dependency</strong>, with the rest 18.5% from direct dependency, and only a small portion (6.19%) was from package itself.</p>
 <p align=center>
 <img src=./assets/img/vulnDiscoveryTime_depType.png alt=tag width=100%>
 </p>
 <p class=caption>
 <i>Vulnerable discovery time based on dependency type</i>
 </p>
-<p>To determine when the vulnerabilities were discovered, we calculated the time lapsed between the \textit{release time} of a vulnerable package and the \textit{publication time} of the corresponding vulnerability in days, and plotted it against the vulnerability dependency type of self, direct, or indirectly depending on a vulnerable root package in Figure \ref{Fig:VulnDiscoveryTime_depType}. Most vulnerabilities were discovered after the release of the package, as the time lapsed between package release and vulnerable publication is positive. As Figure \ref{Fig:VulnDiscoveryTime_depType} uncovers, the discovery time of vulnerabilities shows different patterns based on dependency type: \textbf{for packages that have vulnerabilities within themselves, it took shorter time to discover those vulnerabilities}, compared to those which have vulnerabilities due direct or indirect dependencies. The time to catch vulnerabilities due to indirect dependencies can range from one to nearly 3000 days, while the time to detect and publish a vulnerability from direct dependency peaked around 1000 days. Only a small portion of vulnerabilities are immediately vulnerable with negative time lapsed, and will be discussed in detail in the next section.</p>
+<p>To determine when the vulnerabilities were discovered, we calculated the time lapsed between the <em>release time</em> of a vulnerable package and the <em>publication time</em> of the corresponding vulnerability in days, and plotted it against the vulnerability dependency type of self, direct, or indirectly depending on a vulnerable root package in the figure above. Most vulnerabilities were discovered after the release of the package, as the time lapsed between package release and vulnerable publication is positive. As the figure uncovers, the discovery time of vulnerabilities shows different patterns based on dependency type: <strong>for packages that have vulnerabilities within themselves, it took shorter time to discover those vulnerabilities</strong>, compared to those which have vulnerabilities due direct or indirect dependencies. The time to catch vulnerabilities due to indirect dependencies can range from one to nearly 3,000 days, while the time to detect and publish a vulnerability from direct dependency peaked around 1,000 days. Only a small portion of vulnerabilities are immediately vulnerable with negative time lapsed, and will be discussed in detail in the next section.</p>
 <p align=center>
 <img src=./assets/img/vulnDiscoveryTime_severity.png alt=tag width=100%>
 </p>
 <p class=caption>
 <i>Vulnerable discovery time based on dependency type</i>
 </p>
-<p>In addition to examining the vulnerability discovery time with respect to the dependency type, we further studied the discovery time from the perspective of vulnerability severity level, as shown in Figure \ref{Fig:VulnDiscoveryTime_severity} with a box plot. Note that there are no significant difference in vulnerability discovery time based on severity, with relatively shorter discovery time in severity vulnerabilities.</p>
+<p>In addition to examining the vulnerability discovery time with respect to the dependency type, we further studied the discovery time from the perspective of vulnerability severity level, as shown in the above figure with a box plot. Note that there are no significant difference in vulnerability discovery time based on severity, with relatively shorter discovery time in severity vulnerabilities.</p>
 <h4 id=which-packages-are-immediately-vulnerable-and-what-are-their-distributions-with-respect-to-vulnerability-dependency-types-and-severity-levels>Which packages are immediately vulnerable, and what are their distributions with respect to vulnerability dependency types and severity levels?</h4>
 <p>Through this question, we aimed to understand how many packages are immediately vulnerable, i.e. a vulnerability had already been found and published in a direct or indirect dependency at the time of the release. We also analyzed how many of such immediately vulnerable packages have vulnerabilities due to direct and indirect dependencies.</p>
-<p>Of all the vulnerabilities that we analyzed, we found that $82,777$ (5% of the $1,654,568$ vulnerabilities) can be considered immediate vulnerabilities. Of these immediate vulnerabilities, \textbf{a large majority ($74,258$ out of $82,777$ or 89.71%) are caused by indirect dependencies} and only a small percentage ($7,177$ out of $82,777$ or 9.32%) due to direct dependencies. Figure \ref{Fig:ImmediatelyVulnerable} shows the number of days before the release of a package when a vulnerability was published in its dependencies. We can see that most immediately vulnerable releases are using dependencies in which \textbf{vulnerabilities have been published within 6 months before the release}. Interestingly, there are some immediately vulnerable releases that have used dependencies where vulnerability was published ~6.5 years ago.</p>
+<p>Of all the vulnerabilities that we analyzed, we found that 82,777 (5% of the 1,654,568 vulnerabilities) can be considered immediate vulnerabilities. Of these immediate vulnerabilities, <strong>a large majority (74,258 out of 82,777 or 89.71%) are caused by indirect dependencies</strong> and only a small percentage (7,177 out of 82,777 or 9.32%) due to direct dependencies. The figure below shows the number of days before the release of a package when a vulnerability was published in its dependencies. We can see that most immediately vulnerable releases are using dependencies in which <strong>vulnerabilities have been published within 6 months before the release</strong>. Interestingly, there are some immediately vulnerable releases that have used dependencies where vulnerability was published ~6.5 years ago.</p>
 <p align=center>
 <img src=./assets/img/immediately_vuln.png alt=tag width=100%>
 </p>
 <p class=caption>
 <i>Immediately vulnerable releases based on dependency type</i>
 </p>
-<p>Table \ref{table:ImmediatelyVulnerableSeverity} shows the severity levels of vulnerabilities found in all immediate vulnerabilities. We observed that majority of the vulnerabilities were of medium severity, around a quarter were of high severity and a very small fraction were of critical severity.</p>
+<p>The table below shows the severity levels of vulnerabilities found in all immediate vulnerabilities. We observed that majority of the vulnerabilities were of medium severity, around a quarter were of high severity and a very small fraction were of critical severity.</p>
 <div class=tableStyle align=center>
 <table>
 <thead>
@@ -413,7 +428,13 @@ tool.</p>
 <i>Severity levels of vulnerabilities in immediately vulnerable releases</i>
 </p>
 <h4 id=what-are-the-most-frequent-vulnerable-types-and-severity-levels-in-all-package-releases-and-most-recent-release>What are the most frequent vulnerable types and severity levels, in all package releases and most recent release?</h4>
-<p>Based on the 1,654,568 vulnerabilities analyzed, for both all past releases and the most recent release, we summarized the most frequent types of vulnerabilities in table \ref{table:MostFreqVuln}. Interestingly, both most recent releases and all past releases \textbf{share the same set of the most frequency vulnerability types}: &ldquo;Regular Expression Denial of Service (ReDoS)&rdquo;, &ldquo;Prototype Pollution&rdquo;, and &ldquo;Arbitrary Code Injection&rdquo;, and the majority of vulnerabilities across both datasets are in medium severity level.</p>
+<p>Based on the 1,654,568 vulnerabilities analyzed, for both all past releases and the most recent release, we summarized the most frequent types of vulnerabilities in the table below. Interestingly, both most recent releases and all past releases <strong>share the same set of the most frequency vulnerability types</strong>:</p>
+<ul>
+<li>Regular Expression Denial of Service (ReDoS)</li>
+<li>Prototype Pollution</li>
+<li>Arbitrary Code Injection</li>
+</ul>
+<p>and the majority of vulnerabilities across both datasets are in medium severity level.</p>
 <table>
 <thead>
 <tr>
